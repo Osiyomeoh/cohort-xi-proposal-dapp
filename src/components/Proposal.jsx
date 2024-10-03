@@ -1,6 +1,6 @@
 import { Box, Button, Flex, Text } from "@radix-ui/themes";
 import { formatEther } from "ethers";
-import useVote from "../hooks/useVoteForProposal";
+import useVote from "../hooks/useVote";
 
 const Proposal = ({
     proposalId,
