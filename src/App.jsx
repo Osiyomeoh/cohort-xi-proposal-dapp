@@ -1,5 +1,4 @@
 import { Box } from "@radix-ui/themes";
-import Layout from "./components/Layout";
 import CreateProposalModal from "./components/CreateProposalModal";
 import Proposals from "./components/Proposals";
 import useContract from "./hooks/useContract";
@@ -8,6 +7,7 @@ import { Contract } from "ethers";
 import useRunners from "./hooks/useRunners";
 import { Interface } from "ethers";
 import ABI from "./ABI/proposal.json";
+import Layout from "./components/Layout"
 
 const multicallAbi = [
     "function tryAggregate(bool requireSuccess, (address target, bytes callData)[] calls) returns ((bool success, bytes returnData)[] returnData)",
@@ -35,7 +35,7 @@ function App() {
             );
 
             const proposalsIds = Array.from(
-                { length: proposalCount - 1 },
+                { length: proposalCount },
                 (_, i) => i + 1
             );
 
@@ -53,7 +53,8 @@ function App() {
                 itf.decodeFunctionResult("proposals", res.returnData)
             );
 
-            const data = decodedResults.map((proposalStruct) => ({
+            const data = decodedResults.map((proposalStruct, i) => ({
+                proposalId: i + 1,
                 description: proposalStruct.description,
                 amount: proposalStruct.amount,
                 minRequiredVote: proposalStruct.minVotesToPass,
@@ -68,8 +69,45 @@ function App() {
         }
     }, [readOnlyProposalContract, readOnlyProvider]);
 
+    const onProposalCreated = (proposalId, description, recipient, amount, votingDeadline, minVotesToPass) => {
+
+        setProposals((prevProposals) => [
+            ...prevProposals,
+            {
+                proposalId,
+                description: description,
+                amount: amount,
+                minRequiredVote: minVotesToPass,
+                votecount: 0,
+                deadline: votingDeadline,
+                executed: false,
+            }
+        ])
+       
+       
+    };
+    const onVoted = (proposalId, voter) => {
+    setProposals((prevProposals) => prevProposals.map((proposal) => {
+        if (Number(proposal.proposalId) === Number(proposalId) ) {
+            return {
+                ...proposal,
+                votecount: Number(proposal.votecount) + 1,
+            };
+        }
+        return proposal;
+    }))       
+    };
+
     useEffect(() => {
+        if(!readOnlyProposalContract) return;
+        readOnlyProposalContract.on("ProposalCreated", onProposalCreated);
+        readOnlyProposalContract.on("Voted", onVoted);
         fetchProposals();
+
+        return () => {
+           readOnlyProposalContract.removeListener("ProposalCreated", onProposalCreated)
+           readOnlyProposalContract.removeListener("Voted", onVoted)
+        }
     }, [fetchProposals]);
 
     return (
