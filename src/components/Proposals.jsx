@@ -9,6 +9,7 @@ const Proposals = ({ proposals }) => {
             ) : (
                 proposals.map(
                     ({
+                        proposalId,
                         deadline,
                         minRequiredVote,
                         amount,
@@ -18,6 +19,7 @@ const Proposals = ({ proposals }) => {
                     }) => (
                         <Proposal
                             key={`${deadline}${minRequiredVote}`}
+                            proposalId={proposalId}
                             amount={amount}
                             deadline={deadline}
                             description={description}
