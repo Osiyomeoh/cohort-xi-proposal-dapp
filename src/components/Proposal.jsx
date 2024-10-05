@@ -1,6 +1,7 @@
 import { Box, Button, Flex, Text } from "@radix-ui/themes";
 import { formatEther } from "ethers";
 import useVote from "../hooks/useVote";
+import useExecuteProposal from "../hooks/useExecute";
 
 const Proposal = ({
     proposalId,
@@ -12,6 +13,7 @@ const Proposal = ({
     executed,
 }) => {
     const handleVote = useVote();
+    const handleExecute = useExecuteProposal();
     return (
         <Box className="bg-slate-400 rounded-md shadow-sm p-4 w-96">
             <Text className="text-2xl mb-4">Proposals</Text>
@@ -44,7 +46,10 @@ const Proposal = ({
                 </Flex>
             </Box>
             <Button onClick={() => handleVote(BigInt(proposalId))} className="bg-blue-500 text-white font-bold w-full mt-4 p-4 rounded-md shadow-sm">
-                Vote
+                Vote 
+            </Button>
+            <Button onClick={() => handleExecute(BigInt(proposalId))} className="bg-blue-500 text-white font-bold w-full mt-4 p-4 rounded-md shadow-sm">
+                Execute
             </Button>
         </Box>
     );

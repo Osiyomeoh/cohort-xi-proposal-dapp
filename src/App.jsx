@@ -91,7 +91,7 @@ function App() {
         if (Number(proposal.proposalId) === Number(proposalId) ) {
             return {
                 ...proposal,
-                votecount: Number(proposal.votecount),
+                votecount: Number(proposal.votecount + 1),
             };
         }
         return proposal;
